@@ -1,0 +1,13 @@
+apply plugin: 'java'
+
+
+
+repositories{
+	mavenCentral();
+
+}
+
+dependencies{
+	testCompile group: 'org.jboss.arquillian.junit', name: 'arquillian-junit-container', version: '1.1.5.Final'
+	testCompile group: 'org.wildfly', name: 'wildfly-arquillian-container-remote', version: '8.0.0.Final'
+}
