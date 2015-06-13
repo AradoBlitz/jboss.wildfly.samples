@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script type="text/javascript" src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
+<script type="text/javascript">
+	var webSocket;
+	$(document).ready(function(){
+		$('.chat-wrapper').hide();
+		
+		$('#enterRoom').click(function(evt){
+			evt.preventDefault();
+			webSocket = new WebSocket("ws://0.0.0.0:8080/jboss.wildfly.samples/chat/java");
+			webSocket.onmessage = function(evt){
+				console.log('Input message: ' + evt.data);
+				var msg=JSON.parse(evt.data);
+				var messageLine = $('<tr><td>' + msg.message + '</td></tr>');
+				$('#response').append(messageLine);
+			};
+			$('.chat-wrapper h2').text('Chat # ' + $('#nickname').val() + '@' + $('#chatroom option:selected').val());
+			$('.chat-signin').hide();
+			$('.chat-wrapper').show();
+			$('#message').focus();
+		});
+		$('#do-chat').submit(function(evt){
+			evt.preventDefault();
+			
+			webSocket.send('{"message":"' + $('#message').val() + '"}');
+		});
+		$('#leave-room').click(function(){
+			webSocket.close();
+			$('#response').empty();
+			$('.chat-signin').show();
+			$('.chat-wrapper').hide();
+			$('#nickname').focus();
+		});
+	});
+</script>
+</head>
+<body>
+	<div class="chat-signin">
+		<form class="form-signin">
+			<h2>Chat sign in</h2>
+			<label for="nickname">Nickname</label><input type="text"
+				placeholder="nickname" id="nickname"/>
+			<label>Chatroom</label>
+			<select id="chatroom">
+				<option>Java</option>
+				<option>Groovy</option>
+				<option>Scala</option>
+			</select>
+			<button id="enterRoom" type="submit">Sign in</button>
+		</form>
+	</div>	
+	
+	<div class="chat-wrapper">
+		<form id="do-chat">
+			<h2 class="alert-success"></h2>
+			<table id="response"></table>
+			<fieldset>
+				<legend>Enter your message..</legend>
+				<div class="controls">
+					<input id="message" type="text" placeholder="Your message..."/>
+					<input type="submit" value="Send message"/>
+					<button id="leave-room" type="button" >Leave room</button>
+				</div>
+			</fieldset>
+		</form>
+	</div>
+</body>
+</html>
